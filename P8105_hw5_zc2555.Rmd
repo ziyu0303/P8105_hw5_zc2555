@@ -11,7 +11,7 @@ library(tidyverse)
 ```
 
 
-# Problem 1 (0 point)
+# Problem 1 
 
 * Read in the data
 ```{r message=FALSE}
@@ -98,9 +98,43 @@ city_plot
 ```
 
 
-# Problem 2,
+# Problem 2
+
+* Read in the data
+
+```{r}
+p2_raw = 
+  tibble(file = list.files("./data/"),
+         path = str_c("./data/", file)) 
+```
+
+* Iterate over file names and read in data for each subject using purrr::map 
+
+```{r message=FALSE}
+P2_new =
+  p2_raw %>%
+  
+  mutate(
+    data = map(.x = path, ~read_csv(.x)),
+    arm = str_remove(path,".csv"),
+    arm = str_remove(arm, "./p2data/")) %>%
+  separate(arm, c("arm","id"), sep = "_") %>%
+  
+  mutate(
+    arm = ifelse(arm == "con","control","experiment"))%>%
+  unnest(data) %>%
+  select(-path, -file) %>%
+  pivot_longer(
+    week_1:week_8,
+    values_to = "Observation",
+    names_to = "Week") 
 
 
+
+
+
+  
+```
 
 
 
