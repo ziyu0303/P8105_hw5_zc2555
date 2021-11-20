@@ -1,0 +1,19 @@
+---
+title: "Homework 5"
+author: "Ziyu Chen"
+date: "11/19/2021"
+output: html_document
+---
+#R setup
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+# read in the data
+```{r}
+murder_df = 
+  read_csv(url("https://github.com/washingtonpost/data-homicides/raw/master/homicide-data.csv")) %>%
+  mutate(city_state = paste(city, state, sep = ","))
+```
+
