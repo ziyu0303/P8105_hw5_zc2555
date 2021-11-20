@@ -36,7 +36,7 @@ murder_new %>%
 
 murder_unsolved =
   murder_new %>%
-  filter(disposition %in% c("Closed without arrest","Open/no arrest")) %>%
+  filter(disposition %in% c("Closed without arrest","Open/No arrest")) %>%
   group_by(city_state) %>%
   summarise(unsolved = n())
 
@@ -63,6 +63,38 @@ prop.test(
   broom::tidy()                
 
 
+```
+
+* Proportion of unsolved homicides and the confidence interval for each city
+```{r}
+  final_new = final %>%
+  mutate(
+    prop = map2(.x = unsolved,               
+                .y = total, 
+                ~prop.test(x = .x, n = .y)),
+    tidy = map(.x = prop,           
+               ~broom::tidy(.x))) %>%             
+  unnest(tidy) %>%                                       
+  select(city_state, estimate, conf.low, conf.high)
+  
+final_new
+
+```
+
+Make the plot
+
+```{r}
+city_plot = 
+  final_new %>%
+mutate(city_state = fct_reorder(city_state,estimate)) %>%                
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() + 
+  geom_errorbar(aes(ymin = conf.low , ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.6, hjust = 1)) +
+  ggtitle("Estimates and CIs of Homocides for each city") +
+  xlab("City & State") +
+  ylab("Estimates") 
+city_plot
 ```
 
 
