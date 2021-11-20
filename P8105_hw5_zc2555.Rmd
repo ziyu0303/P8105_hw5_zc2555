@@ -5,15 +5,42 @@ date: "11/19/2021"
 output: html_document
 ---
 #R setup
-```{r}
+```{r message=FALSE}
 library(readxl)
 library(tidyverse)
 ```
 
-# read in the data
+
+# Problem 1
+
+_Read in the data_
+```{r message=FALSE}
+murder_raw = 
+  read_csv(url("https://github.com/washingtonpost/data-homicides/raw/master/homicide-data.csv")) 
+```
+
+Murder_df has 52179 observations and 12 variables, including city, city_state, disposition, lat, lon, reported_date, state, uid, victim_age, victim_first, victim_last, victim_race, victim_sex. This dataset contains information about homicide cases in the United States. 
+
+_Create the city_state variable,  find the murders count within the city_
 ```{r}
-murder_df = 
-  read_csv(url("https://github.com/washingtonpost/data-homicides/raw/master/homicide-data.csv")) %>%
-  mutate(city_state = paste(city, state, sep = ","))
+murder_new = murder_raw %>%
+   mutate(city_state = paste(city, state, sep = ",")) %>%
+  group_by(city_state)
+
+
+murder_total=
+murder_new %>%
+  group_by(city_state) %>%
+  summarise(total = n())
+
+murder_total
+
+murder_unsolved =
+  murder_new %>%
+  filter(disposition %in% c("Closed without arrest","Open/no arrest")) %>%
+  group_by(city_state) %>%
+  summarise(unsolved = n())
+
+murder_unsolved
 ```
 
