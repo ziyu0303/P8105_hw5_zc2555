@@ -42,12 +42,11 @@ murder_unsolved =
 
 final = merge(murder_total, murder_unsolved, by = "city_state")
   
-  knitr::kable(final [1:10, ]) #showing the only first ten rows to make sure that the data are correct
-
+  knitr::kable(final)
 
 ```
 
-The final table will have information the total and unsolved cases for cities in the US.
+* The final table will have information the total and unsolved cases for cities in the US.
 
 
 * prop.test function on baltimore
@@ -127,15 +126,24 @@ P2_new =
   pivot_longer(
     week_1:week_8,
     values_to = "Observation",
-    names_to = "Week") 
-
-
-
+    names_to = "Week",
+    names_prefix = "week_") 
 
 
   
 ```
 
+```{r}
+P2_new %>%
+  ggplot(aes(x = Week, y = Observation, color = arm, group = ID)) +
+    geom_line(alpha = 0.5, size = 2) +
+    geom_smooth(aes(group = arm), se = F, size = 4) +
+    labs(x = "follow-up time (week)") +
+    theme_minimal()
+
+
+
+```
 
 
 
