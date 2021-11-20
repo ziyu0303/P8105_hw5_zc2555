@@ -2,7 +2,7 @@
 title: "Homework 5"
 author: "Ziyu Chen"
 date: "11/19/2021"
-output: html_document
+output: github_document
 ---
 #R setup
 ```{r message=FALSE}
@@ -24,7 +24,7 @@ Murder_df has 52179 observations and 12 variables, including city, city_state, d
 _Create the city_state variable,  find the murders count within the city_
 ```{r}
 murder_new = murder_raw %>%
-   mutate(city_state = paste(city, state, sep = ",")) %>%
+   mutate(city_state = paste(city, state, sep = ", ")) %>%
   group_by(city_state)
 
 
@@ -33,14 +33,16 @@ murder_new %>%
   group_by(city_state) %>%
   summarise(total = n())
 
-murder_total
-
 murder_unsolved =
   murder_new %>%
   filter(disposition %in% c("Closed without arrest","Open/no arrest")) %>%
   group_by(city_state) %>%
   summarise(unsolved = n())
 
-murder_unsolved
+final = left_join(murder_total, murder_unsolved, by = "city_state")
+  
+  knitr::kable(final [1:10, ]) #showing the only first ten rows to make sure that the data are correct
+
+
 ```
 
