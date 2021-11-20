@@ -11,9 +11,9 @@ library(tidyverse)
 ```
 
 
-# Problem 1
+# Problem 1 (0 point)
 
-_Read in the data_
+* Read in the data
 ```{r message=FALSE}
 murder_raw = 
   read_csv(url("https://github.com/washingtonpost/data-homicides/raw/master/homicide-data.csv")) 
@@ -21,11 +21,12 @@ murder_raw =
 
 Murder_df has 52179 observations and 12 variables, including city, city_state, disposition, lat, lon, reported_date, state, uid, victim_age, victim_first, victim_last, victim_race, victim_sex. This dataset contains information about homicide cases in the United States. 
 
-_Create the city_state variable,  find the murders count within the city_
+* Create the city_state variable,  find the murders count within the city_
 ```{r}
 murder_new = murder_raw %>%
-   mutate(city_state = paste(city, state, sep = ", ")) %>%
-  group_by(city_state)
+   mutate(city_state = str_c(city, state, sep = ", ")) %>%
+  group_by(city_state) %>%
+   subset(city_state != "Tulsa, AL")
 
 
 murder_total=
@@ -39,10 +40,38 @@ murder_unsolved =
   group_by(city_state) %>%
   summarise(unsolved = n())
 
-final = left_join(murder_total, murder_unsolved, by = "city_state")
+final = merge(murder_total, murder_unsolved, by = "city_state")
   
   knitr::kable(final [1:10, ]) #showing the only first ten rows to make sure that the data are correct
 
 
 ```
+
+The final table will have information the total and unsolved cases for cities in the US.
+
+
+* prop.test function on baltimore
+
+```{r}
+prop.test(
+    x=murder_unsolved %>% 
+    filter(city_state == "Baltimore, MD") %>%
+    pull(unsolved),
+    n=murder_total %>%
+    filter(city_state == "Baltimore, MD") %>%
+    pull(total)) %>%
+  broom::tidy()                
+
+
+```
+
+
+# Problem 2,
+
+
+
+
+
+
+
 
