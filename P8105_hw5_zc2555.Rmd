@@ -148,7 +148,6 @@ P2_plot = P2_new %>%
   select(-path, -file) %>%
   ggplot() +
   geom_line(aes(x = Week, y = Observation, group = ID, color = arm_cat)) +
-  ggtitle("Observations On Each Subject Over Time") +
   labs(title = "Observations value on each subject over time")
     
   
