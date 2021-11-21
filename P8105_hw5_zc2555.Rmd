@@ -157,7 +157,7 @@ P2_plot
 ```
 
 * As we can see, the the value of observation count in control group 
-are usually lower than the experiement arm and the counts gradully increase over time. 
+are usually lower than the experiment arm and the counts gradually increase over time. 
 
 # Problem 3
 
