@@ -137,6 +137,7 @@ P2_new =
       arm_cat = arm) %>%
      unite("ID",c(arm,id)) 
 
+P2_new 
 
 ```
 
