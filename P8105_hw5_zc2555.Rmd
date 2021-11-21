@@ -103,49 +103,110 @@ city_plot
 
 ```{r}
 p2_raw = 
-  tibble(file = list.files("./data/"),
+  tibble(file = list.files("./data/"),   # read in the data
          path = str_c("./data/", file)) 
 ```
 
 * Iterate over file names and read in data for each subject using purrr::map 
 
 ```{r message=FALSE}
+read_data = function (name) {read_csv(str_c("./data/", name))
+}
+  
+p2_raw %>% 
+  mutate(data = map(file, read_data)) %>%
+  unnest(data)
+  
 P2_new =
   p2_raw %>%
   
   mutate(
     data = map(.x = path, ~read_csv(.x)),
     arm = str_remove(path,".csv"),
-    arm = str_remove(arm, "./p2data/")) %>%
-  separate(arm, c("arm","id"), sep = "_") %>%
-  
+    arm = str_remove(arm, "./data/")) %>%
+  separate(arm, into = c("arm","id"), sep = "_") %>%
   mutate(
-    arm = ifelse(arm == "con","control","experiment"))%>%
+    arm = if_else(arm == "con","control arm","experiment arm"))%>%       #creating the categories for treatment arm
   unnest(data) %>%
   select(-path, -file) %>%
   pivot_longer(
     week_1:week_8,
     values_to = "Observation",
     names_to = "Week",
-    names_prefix = "week_") 
+    names_prefix = "week_") %>%
+    mutate (
+      Week= as.numeric(Week),
+      arm_cat = arm) %>%
+     unite("ID",c(arm,id)) 
 
 
-  
 ```
+
+
+Making spagetti plot
+```{r}
+P2_plot = P2_new %>%
+  ggplot() +
+  geom_line(aes(x = Week, y = Observation, group = ID, color = arm_cat)) +
+  ggtitle("Observations On Each Subject Over Time") +
+  labs(title = "Observations value on each subject over time")
+    
+  
+P2_plot
+
+
+```
+
+* As we can see, the the value of observation count in control group 
+are usually lower than the experiement arm and the counts gradully increase over time. 
+
+# Problem 3
+
+* Insert the sample chunk and take a look at the dataset
+```{r}
+set.seed(10)
+
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species)) 
+
+iris_with_missing
+```
+* write a function that provides with missing data
 
 ```{r}
-P2_new %>%
-  ggplot(aes(x = Week, y = Observation, color = arm, group = ID)) +
-    geom_line(alpha = 0.5, size = 2) +
-    geom_smooth(aes(group = arm), se = F, size = 4) +
-    labs(x = "follow-up time (week)") +
-    theme_minimal()
+iris_new = 
+  iris_with_missing %>%
+  janitor::clean_names() %>%
+  mutate(species = if_else(is.na(species), "virginica", species))
+
+sepal_mean =
+  mean(pull(iris_new, sepal_length),na.rm = TRUE)
 
 
-
+fill_in_missing = function(x) {
+  
+  if (is.na(x)) {
+  
+    if (is.numeric(x)) {
+      x = sepal_mean
+    }
+  
+    if (is.character(x)) {
+      x = "virginica"
+    }
+  
+  }
+  return(x)
+}
 ```
 
 
+```{r}
+iris_filled =
+  iris_new %>%
+  mutate(sepal_length = map(pull(iris_new,sepal_length),fill_in_missing),
+         species = map(pull(iris_new,species),fill_in_missing))
 
-
+```
 
